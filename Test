@@ -1,0 +1,156 @@
+-- 🌟 UNIVERSAL FAKE GIFTER - ALL BLOX FRUITS PERMS
+getgenv().robux = 100000
+getgenv().SelectedFruit = "Kitsune"  -- Change this to any fruit!
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))() -- Executor check
+
+-- 💎 UNIVERSAL FAKE GIFTER HUB
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local FruitSelector = Instance.new("TextBox")
+local PermSelector = Instance.new("TextBox")
+local GiftButton = Instance.new("TextButton")
+local RobuxLabel = Instance.new("TextLabel")
+
+-- GUI Setup
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "UniversalFakeGifter"
+
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+MainFrame.Size = UDim2.new(0, 300, 0, 200)
+MainFrame.Active = true
+MainFrame.Draggable = true
+
+-- Fruit Dropdown (ALL FRUITS)
+FruitSelector.Parent = MainFrame
+FruitSelector.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+FruitSelector.BorderSizePixel = 0
+FruitSelector.Position = UDim2.new(0.05, 0, 0.1, 0)
+FruitSelector.Size = UDim2.new(0.9, 0, 0.2, 0)
+FruitSelector.Font = Enum.Font.GothamBold
+FruitSelector.Text = "Kitsune"
+FruitSelector.TextColor3 = Color3.fromRGB(255, 255, 255)
+FruitSelector.TextScaled = true
+FruitSelector.ClearTextOnFocus = false
+
+-- All Fruits List
+local AllFruits = {
+    "Kitsune", "Control", "Dragon", "Dough", "Leopard", 
+    "Mammoth", "T-Rex", "Blizzard", "Ghost", "Venom",
+    "Shadow", "Sound", "Sand", "Magma", "Flame"
+}
+
+local FruitList = Instance.new("ScrollingFrame")
+FruitList.Parent = MainFrame
+FruitList.BackgroundTransparency = 1
+FruitList.Position = UDim2.new(0.05, 0, 0.35, 0)
+FruitList.Size = UDim2.new(0.9, 0, 0.4, 0)
+FruitList.CanvasSize = UDim2.new(0, 0, 0, 200)
+
+-- Populate Fruit List
+for i, fruit in ipairs(AllFruits) do
+    local FruitBtn = Instance.new("TextButton")
+    FruitBtn.Parent = FruitList
+    FruitBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+    FruitBtn.BorderSizePixel = 0
+    FruitBtn.Position = UDim2.new(0, 0, 0, (i-1)*30)
+    FruitBtn.Size = UDim2.new(1, 0, 0, 25)
+    FruitBtn.Font = Enum.Font.Gotham
+    FruitBtn.Text = fruit
+    FruitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    FruitBtn.TextScaled = true
+    
+    FruitBtn.MouseButton1Click:Connect(function()
+        FruitSelector.Text = fruit
+        getgenv().SelectedFruit = fruit
+    end)
+end
+
+-- Perm Selector
+PermSelector.Parent = MainFrame
+PermSelector.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
+PermSelector.BorderSizePixel = 0
+PermSelector.Position = UDim2.new(0.05, 0, 0.8, 0)
+PermSelector.Size = UDim2.new(0.4, 0, 0.15, 0)
+PermSelector.Font = Enum.Font.GothamBold
+PermSelector.Text = "1"
+PermSelector.TextColor3 = Color3.fromRGB(255, 255, 255)
+PermSelector.TextScaled = true
+
+-- Gift Button
+GiftButton.Parent = MainFrame
+GiftButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+GiftButton.BorderSizePixel = 0
+GiftButton.Position = UDim2.new(0.55, 0, 0.8, 0)
+GiftButton.Size = UDim2.new(0.4, 0, 0.15, 0)
+GiftButton.Font = Enum.Font.GothamBold
+GiftButton.Text = "FAKE GIFT!"
+GiftButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GiftButton.TextScaled = true
+
+-- Robux Display
+RobuxLabel.Parent = MainFrame
+RobuxLabel.BackgroundTransparency = 1
+RobuxLabel.Position = UDim2.new(0.05, 0, 0.05, 0)
+RobuxLabel.Size = UDim2.new(0.9, 0, 0.05, 0)
+RobuxLabel.Font = Enum.Font.GothamBold
+RobuxLabel.Text = "💎 Robux: 100,000"
+RobuxLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+RobuxLabel.TextScaled = true
+
+-- 🎁 FAKE GIFTING FUNCTION (UNIVERSAL)
+local function FakeGift()
+    local fruit = FruitSelector.Text
+    local perm = PermSelector.Text
+    
+    if not fruit or not perm then return end
+    
+    -- Create fake chat messages
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+        "[GIFT] Gifting " .. fruit .. " Perm " .. perm .. " to @" .. game.Players.LocalPlayer.Name .. "!", "All"
+    )
+    
+    -- Fake system messages
+    for i = 1, 5 do
+        wait(0.5)
+        game.StarterGui:SetCore("ChatMakeSystemMessage", {
+            Text = "[GIFTING] " .. game.Players.LocalPlayer.Name .. " received " .. fruit .. " Perm " .. perm .. "!";
+            Color = Color3.fromRGB(0, 255, 0);
+            Font = 3;
+            FontSize = 18;
+        })
+    end
+    
+    -- Visual effects
+    local Effects = Instance.new("Explosion")
+    Effects.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+    Effects.Parent = workspace
+    
+    print("🎁 FAKED GIFT: " .. fruit .. " Perm " .. perm)
+end
+
+-- Button Events
+GiftButton.MouseButton1Click:Connect(FakeGift)
+
+-- Perm buttons (1,2,3)
+for i = 1, 3 do
+    local PermBtn = Instance.new("TextButton")
+    PermBtn.Parent = MainFrame
+    PermBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
+    PermBtn.BorderSizePixel = 0
+    PermBtn.Position = UDim2.new(0.05 + (i-1)*0.32, 0, 0.65, 0)
+    PermBtn.Size = UDim2.new(0.28, 0, 0.12, 0)
+    PermBtn.Font = Enum.Font.GothamBold
+    PermBtn.Text = tostring(i)
+    PermBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    PermBtn.TextScaled = true
+    
+    PermBtn.MouseButton1Click:Connect(function()
+        PermSelector.Text = tostring(i)
+    end)
+end
+
+print("🌟 Universal Fake Gifter LOADED! Select fruit & click GIFT!")
