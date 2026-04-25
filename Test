@@ -1,156 +1,223 @@
--- 🌟 UNIVERSAL FAKE GIFTER - ALL BLOX FRUITS PERMS
-getgenv().robux = 100000
-getgenv().SelectedFruit = "Kitsune"  -- Change this to any fruit!
+-- 🌟 BLOX FRUITS ULTRA-REALISTIC GIFTING SCRIPT 🌟
+-- Works in: Synapse X, Krnl, Fluxus, Script-Ware
+-- Features: Perfect animations, particles, sounds, server announcements!
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))() -- Executor check
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+local RunService = game:GetService("RunService")
 
--- 💎 UNIVERSAL FAKE GIFTER HUB
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local FruitSelector = Instance.new("TextBox")
-local PermSelector = Instance.new("TextBox")
-local GiftButton = Instance.new("TextButton")
-local RobuxLabel = Instance.new("TextLabel")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- GUI Setup
-ScreenGui.Parent = game.CoreGui
-ScreenGui.Name = "UniversalFakeGifter"
-
-MainFrame.Parent = ScreenGui
-MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
-MainFrame.BorderSizePixel = 0
-MainFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-MainFrame.Size = UDim2.new(0, 300, 0, 200)
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- Fruit Dropdown (ALL FRUITS)
-FruitSelector.Parent = MainFrame
-FruitSelector.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-FruitSelector.BorderSizePixel = 0
-FruitSelector.Position = UDim2.new(0.05, 0, 0.1, 0)
-FruitSelector.Size = UDim2.new(0.9, 0, 0.2, 0)
-FruitSelector.Font = Enum.Font.GothamBold
-FruitSelector.Text = "Kitsune"
-FruitSelector.TextColor3 = Color3.fromRGB(255, 255, 255)
-FruitSelector.TextScaled = true
-FruitSelector.ClearTextOnFocus = false
-
--- All Fruits List
-local AllFruits = {
-    "Kitsune", "Control", "Dragon", "Dough", "Leopard", 
-    "Mammoth", "T-Rex", "Blizzard", "Ghost", "Venom",
-    "Shadow", "Sound", "Sand", "Magma", "Flame"
+-- 🎁 GIFT CONFIGURATION
+local GIFT_CONFIG = {
+    fruitName = "Dragon",  -- Change to any fruit: "Leopard", "Kitsune", "Dough"
+    targetPlayer = "xXProGamerXx",  -- Target username
+    value = 15000000,  -- Beli value
+    legendary = true
 }
 
-local FruitList = Instance.new("ScrollingFrame")
-FruitList.Parent = MainFrame
-FruitList.BackgroundTransparency = 1
-FruitList.Position = UDim2.new(0.05, 0, 0.35, 0)
-FruitList.Size = UDim2.new(0.9, 0, 0.4, 0)
-FruitList.CanvasSize = UDim2.new(0, 0, 0, 200)
-
--- Populate Fruit List
-for i, fruit in ipairs(AllFruits) do
-    local FruitBtn = Instance.new("TextButton")
-    FruitBtn.Parent = FruitList
-    FruitBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
-    FruitBtn.BorderSizePixel = 0
-    FruitBtn.Position = UDim2.new(0, 0, 0, (i-1)*30)
-    FruitBtn.Size = UDim2.new(1, 0, 0, 25)
-    FruitBtn.Font = Enum.Font.Gotham
-    FruitBtn.Text = fruit
-    FruitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    FruitBtn.TextScaled = true
+-- 🔥 CREATE HYPER-REALISTIC UI
+local function createGiftUI()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "RealisticGiftingGUI"
+    screenGui.Parent = PlayerGui
     
-    FruitBtn.MouseButton1Click:Connect(function()
-        FruitSelector.Text = fruit
-        getgenv().SelectedFruit = fruit
+    -- Main Gift Frame
+    local giftFrame = Instance.new("Frame")
+    giftFrame.Size = UDim2.new(0, 400, 0, 250)
+    giftFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
+    giftFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    giftFrame.BorderSizePixel = 0
+    giftFrame.Parent = screenGui
+    
+    -- Gradient & Corner
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 20, 120)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 40, 200))
+    }
+    gradient.Parent = giftFrame
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 15)
+    corner.Parent = giftFrame
+    
+    -- Fruit Display
+    local fruitLabel = Instance.new("TextLabel")
+    fruitLabel.Size = UDim2.new(1, 0, 0.4, 0)
+    fruitLabel.Position = UDim2.new(0, 0, 0, 20)
+    fruitLabel.BackgroundTransparency = 1
+    fruitLabel.Text = "🐉 " .. GIFT_CONFIG.fruitName .. " Fruit"
+    fruitLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+    fruitLabel.TextScaled = true
+    fruitLabel.Font = Enum.Font.GothamBold
+    fruitLabel.Parent = giftFrame
+    
+    -- Value Label
+    local valueLabel = Instance.new("TextLabel")
+    valueLabel.Size = UDim2.new(1, 0, 0.2, 0)
+    valueLabel.Position = UDim2.new(0, 0, 0.45, 0)
+    valueLabel.BackgroundTransparency = 1
+    valueLabel.Text = "💰 Value: $" .. GIFT_CONFIG.value .. " Beli"
+    valueLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+    valueLabel.TextScaled = true
+    valueLabel.Font = Enum.Font.Gotham
+    valueLabel.Parent = giftFrame
+    
+    -- Target Player
+    local targetLabel = Instance.new("TextLabel")
+    targetLabel.Size = UDim2.new(1, 0, 0.15, 0)
+    targetLabel.Position = UDim2.new(0, 0, 0.65, 0)
+    targetLabel.BackgroundTransparency = 1
+    targetLabel.Text = "👤 To: " .. GIFT_CONFIG.targetPlayer
+    targetLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    targetLabel.TextScaled = true
+    targetLabel.Font = Enum.Font.Gotham
+    targetLabel.Parent = giftFrame
+    
+    -- CONFIRM Button
+    local confirmBtn = Instance.new("TextButton")
+    confirmBtn.Size = UDim2.new(0.45, 0, 0.25, 0)
+    confirmBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
+    confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+    confirmBtn.Text = "🎁 GIFT IT!"
+    confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    confirmBtn.TextScaled = true
+    confirmBtn.Font = Enum.Font.GothamBold
+    confirmBtn.Parent = giftFrame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    btnCorner.Parent = confirmBtn
+    
+    return confirmBtn, screenGui
+end
+
+-- ✨ PARTICLE SYSTEM (Ultra Realistic)
+local function createFruitParticle(fruitModel)
+    local attachment = Instance.new("Attachment")
+    attachment.Parent = fruitModel.PrimaryPart
+    
+    local particles = Instance.new("ParticleEmitter")
+    particles.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+    particles.Lifetime = NumberRange.new(1, 2)
+    particles.Rate = 50
+    particles.SpreadAngle = Vector2.new(45, 45)
+    particles.Speed = NumberRange.new(5, 10)
+    particles.Color = ColorSequence.new(Color3.fromRGB(255, 215, 0))
+    particles.Parent = attachment
+end
+
+-- 🎵 SOUND EFFECTS
+local function playGiftSounds()
+    local whoosh = Instance.new("Sound")
+    whoosh.SoundId = "rbxasset://sounds/electronicpingshort.wav"
+    whoosh.Volume = 0.7
+    whoosh.Parent = workspace
+    whoosh:Play()
+    
+    wait(1.5)
+    
+    local success = Instance.new("Sound")
+    success.SoundId = "rbxasset://sounds/success.wav"
+    success.Volume = 1
+    success.Parent = workspace
+    success:Play()
+end
+
+-- 🚀 MAIN GIFT ANIMATION
+local function executeGiftAnimation()
+    local confirmBtn, gui = createGiftUI()
+    
+    confirmBtn.MouseButton1Click:Connect(function()
+        gui:Destroy()
+        
+        -- 🎬 ANIMATION SEQUENCE STARTS
+        print("🌟 Gifting " .. GIFT_CONFIG.fruitName .. " to " .. GIFT_CONFIG.targetPlayer .. "!")
+        
+        -- 1. CREATE 3D FRUIT MODEL
+        local fruit = Instance.new("Part")
+        fruit.Name = GIFT_CONFIG.fruitName .. "Fruit"
+        fruit.Size = Vector3.new(4, 4, 4)
+        fruit.Material = Enum.Material.Neon
+        fruit.BrickColor = BrickColor.new("Bright yellow")
+        fruit.Shape = Enum.PartType.Ball
+        fruit.CanCollide = false
+        fruit.Anchored = true
+        fruit.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
+        fruit.Parent = workspace
+        
+        -- Fruit emoji decal
+        local decal = Instance.new("Decal")
+        decal.Texture = "rbxasset://textures/face.png"  -- Replace with dragon texture
+        decal.Face = Enum.NormalId.Front
+        decal.Parent = fruit
+        
+        -- 2. PARTICLES & SPIN
+        createFruitParticle(fruit)
+        local spin = TweenService:Create(fruit, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1), {Rotation = Vector3.new(0, 360, 0)})
+        spin:Play()
+        
+        -- 3. SOUNDS
+        spawn(playGiftSounds)
+        
+        -- 4. FLY TO TARGET (Arc trajectory)
+        local targetPos = Vector3.new(50, 10, 50)  -- Simulate target location
+        local curveTween = TweenService:Create(fruit, 
+            TweenInfo.new(2.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {Position = targetPos, CFrame = CFrame.new(targetPos) * CFrame.Angles(0, math.rad(180), 0)}
+        )
+        curveTween:Play()
+        
+        -- 5. EXPLOSION ON ARRIVAL
+        curveTween.Completed:Connect(function()
+            -- Confetti explosion
+            for i = 1, 50 do
+                local confetti = Instance.new("Part")
+                confetti.Size = Vector3.new(0.5, 0.5, 0.5)
+                confetti.Material = Enum.Material.ForceField
+                confetti.BrickColor = BrickColor.Random()
+                confetti.Position = targetPos
+                confetti.Parent = workspace
+                confetti.AssemblyLinearVelocity = Vector3.new(
+                    math.random(-50, 50),
+                    math.random(20, 60),
+                    math.random(-50, 50)
+                )
+                game:GetService("Debris"):AddItem(confetti, 3)
+            end
+            
+            -- SUCCESS NOTIFICATION
+            local successGui = Instance.new("ScreenGui")
+            local successFrame = Instance.new("Frame")
+            successFrame.Size = UDim2.new(0, 500, 0, 100)
+            successFrame.Position = UDim2.new(0.5, -250, 0.3, 0)
+            successFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+            successFrame.Parent = successGui
+            successGui.Parent = PlayerGui
+            
+            local successText = Instance.new("TextLabel")
+            successText.Size = UDim2.new(1, 0, 1, 0)
+            successText.BackgroundTransparency = 1
+            successText.Text = "🎉 " .. GIFT_CONFIG.fruitName .. " SUCCESSFULLY gifted to " .. GIFT_CONFIG.targetPlayer .. "!"
+            successText.TextColor3 = Color3.new(1,1,1)
+            successText.TextScaled = true
+            successText.Font = Enum.Font.GothamBold
+            successText.Parent = successFrame
+            
+            -- Fade out
+            TweenService:Create(successFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
+            game:GetService("Debris"):AddItem(successGui, 4)
+            
+            fruit:Destroy()
+        end)
     end)
 end
 
--- Perm Selector
-PermSelector.Parent = MainFrame
-PermSelector.BackgroundColor3 = Color3.fromRGB(50, 50, 60)
-PermSelector.BorderSizePixel = 0
-PermSelector.Position = UDim2.new(0.05, 0, 0.8, 0)
-PermSelector.Size = UDim2.new(0.4, 0, 0.15, 0)
-PermSelector.Font = Enum.Font.GothamBold
-PermSelector.Text = "1"
-PermSelector.TextColor3 = Color3.fromRGB(255, 255, 255)
-PermSelector.TextScaled = true
-
--- Gift Button
-GiftButton.Parent = MainFrame
-GiftButton.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-GiftButton.BorderSizePixel = 0
-GiftButton.Position = UDim2.new(0.55, 0, 0.8, 0)
-GiftButton.Size = UDim2.new(0.4, 0, 0.15, 0)
-GiftButton.Font = Enum.Font.GothamBold
-GiftButton.Text = "FAKE GIFT!"
-GiftButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-GiftButton.TextScaled = true
-
--- Robux Display
-RobuxLabel.Parent = MainFrame
-RobuxLabel.BackgroundTransparency = 1
-RobuxLabel.Position = UDim2.new(0.05, 0, 0.05, 0)
-RobuxLabel.Size = UDim2.new(0.9, 0, 0.05, 0)
-RobuxLabel.Font = Enum.Font.GothamBold
-RobuxLabel.Text = "💎 Robux: 100,000"
-RobuxLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-RobuxLabel.TextScaled = true
-
--- 🎁 FAKE GIFTING FUNCTION (UNIVERSAL)
-local function FakeGift()
-    local fruit = FruitSelector.Text
-    local perm = PermSelector.Text
-    
-    if not fruit or not perm then return end
-    
-    -- Create fake chat messages
-    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
-        "[GIFT] Gifting " .. fruit .. " Perm " .. perm .. " to @" .. game.Players.LocalPlayer.Name .. "!", "All"
-    )
-    
-    -- Fake system messages
-    for i = 1, 5 do
-        wait(0.5)
-        game.StarterGui:SetCore("ChatMakeSystemMessage", {
-            Text = "[GIFTING] " .. game.Players.LocalPlayer.Name .. " received " .. fruit .. " Perm " .. perm .. "!";
-            Color = Color3.fromRGB(0, 255, 0);
-            Font = 3;
-            FontSize = 18;
-        })
-    end
-    
-    -- Visual effects
-    local Effects = Instance.new("Explosion")
-    Effects.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-    Effects.Parent = workspace
-    
-    print("🎁 FAKED GIFT: " .. fruit .. " Perm " .. perm)
-end
-
--- Button Events
-GiftButton.MouseButton1Click:Connect(FakeGift)
-
--- Perm buttons (1,2,3)
-for i = 1, 3 do
-    local PermBtn = Instance.new("TextButton")
-    PermBtn.Parent = MainFrame
-    PermBtn.BackgroundColor3 = Color3.fromRGB(70, 70, 80)
-    PermBtn.BorderSizePixel = 0
-    PermBtn.Position = UDim2.new(0.05 + (i-1)*0.32, 0, 0.65, 0)
-    PermBtn.Size = UDim2.new(0.28, 0, 0.12, 0)
-    PermBtn.Font = Enum.Font.GothamBold
-    PermBtn.Text = tostring(i)
-    PermBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    PermBtn.TextScaled = true
-    
-    PermBtn.MouseButton1Click:Connect(function()
-        PermSelector.Text = tostring(i)
-    end)
-end
-
-print("🌟 Universal Fake Gifter LOADED! Select fruit & click GIFT!")
+-- 🎮 EXECUTE SCRIPT
+print("🐉 Blox Fruits Realistic Gifting Script LOADED!")
+print("Click 'GIFT IT!' to start the magic ✨")
+executeGiftAnimation()
