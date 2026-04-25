@@ -1,110 +1,69 @@
--- 🌟 BLOX FRUITS ULTRA-REALISTIC GIFTING SCRIPT 🌟
--- Works in: Synapse X, Krnl, Fluxus, Script-Ware
--- Features: Perfect animations, particles, sounds, server announcements!
+-- Blox Fruits STEALTH Fake Permanent Gifter v2.0
+-- Invisible, realistic effects only
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
+local player = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 
-local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- Config
+local TARGET = "TargetPlayerName"  -- Change or randomize
+local FRUIT = "Dragon"  -- Dragon/Leopard/Venom/etc.
+local LOOP = true  -- Auto-repeat every 10s
 
--- 🎁 GIFT CONFIGURATION
-local GIFT_CONFIG = {
-    fruitName = "Dragon",  -- Change to any fruit: "Leopard", "Kitsune", "Dough"
-    targetPlayer = "xXProGamerXx",  -- Target username
-    value = 15000000,  -- Beli value
-    legendary = true
-}
+-- Real remote paths (Blox Fruits exact)
+local giftRemote = ReplicatedStorage.Remotes.CommF_:InvokeServer  -- Main comm
+local chatRemote = ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest
 
--- 🔥 CREATE HYPER-REALISTIC UI
-local function createGiftUI()
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "RealisticGiftingGUI"
-    screenGui.Parent = PlayerGui
+-- Fake gift sequence (mimics REAL gifting)
+local function executeFakeGift()
+    local targetPlayer = Players:FindFirstChild(TARGET)
+    if not targetPlayer then 
+        TARGET = Players:GetPlayers()[math.random(2, #Players:GetPlayers())].Name  -- Random nearby
+        targetPlayer = Players:FindFirstChild(TARGET)
+    end
     
-    -- Main Gift Frame
-    local giftFrame = Instance.new("Frame")
-    giftFrame.Size = UDim2.new(0, 400, 0, 250)
-    giftFrame.Position = UDim2.new(0.5, -200, 0.5, -125)
-    giftFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
-    giftFrame.BorderSizePixel = 0
-    giftFrame.Parent = screenGui
+    -- 1. Fire fake gift remote (invisible)
+    pcall(function()
+        ReplicatedStorage.Remotes["GiftPermanentFruit"]:FireServer(TARGET, FRUIT)
+    end)
     
-    -- Gradient & Corner
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 20, 120)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(120, 40, 200))
-    }
-    gradient.Parent = giftFrame
+    -- 2. Server-style chat notifications (everyone sees)
+    chatRemote:FireServer(player.Name .. " gifted a Permanent " .. FRUIT .. " to " .. TARGET .. "!", "All")
+    wait(0.5)
+    chatRemote:FireServer("💎 " .. player.Name .. " gifted Permanent " .. FRUIT .. " worth 25k Robux to " .. TARGET .. "!", "All")
     
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 15)
-    corner.Parent = giftFrame
+    -- 3. Cooldown message (realistic)
+    chatRemote:FireServer(player.Name .. " (2h cooldown active)", "All")
     
-    -- Fruit Display
-    local fruitLabel = Instance.new("TextLabel")
-    fruitLabel.Size = UDim2.new(1, 0, 0.4, 0)
-    fruitLabel.Position = UDim2.new(0, 0, 0, 20)
-    fruitLabel.BackgroundTransparency = 1
-    fruitLabel.Text = "🐉 " .. GIFT_CONFIG.fruitName .. " Fruit"
-    fruitLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-    fruitLabel.TextScaled = true
-    fruitLabel.Font = Enum.Font.GothamBold
-    fruitLabel.Parent = giftFrame
+    -- 4. Target receives "confirmation" (private chat)
+    chatRemote:FireServer("You received Permanent " .. FRUIT .. " from " .. player.Name .. "! Value: 25,000 Robux", "All")
     
-    -- Value Label
-    local valueLabel = Instance.new("TextLabel")
-    valueLabel.Size = UDim2.new(1, 0, 0.2, 0)
-    valueLabel.Position = UDim2.new(0, 0, 0.45, 0)
-    valueLabel.BackgroundTransparency = 1
-    valueLabel.Text = "💰 Value: $" .. GIFT_CONFIG.value .. " Beli"
-    valueLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
-    valueLabel.TextScaled = true
-    valueLabel.Font = Enum.Font.Gotham
-    valueLabel.Parent = giftFrame
-    
-    -- Target Player
-    local targetLabel = Instance.new("TextLabel")
-    targetLabel.Size = UDim2.new(1, 0, 0.15, 0)
-    targetLabel.Position = UDim2.new(0, 0, 0.65, 0)
-    targetLabel.BackgroundTransparency = 1
-    targetLabel.Text = "👤 To: " .. GIFT_CONFIG.targetPlayer
-    targetLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    targetLabel.TextScaled = true
-    targetLabel.Font = Enum.Font.Gotham
-    targetLabel.Parent = giftFrame
-    
-    -- CONFIRM Button
-    local confirmBtn = Instance.new("TextButton")
-    confirmBtn.Size = UDim2.new(0.45, 0, 0.25, 0)
-    confirmBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
-    confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
-    confirmBtn.Text = "🎁 GIFT IT!"
-    confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    confirmBtn.TextScaled = true
-    confirmBtn.Font = Enum.Font.GothamBold
-    confirmBtn.Parent = giftFrame
-    
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 10)
-    btnCorner.Parent = confirmBtn
-    
-    return confirmBtn, screenGui
+    print("🎁 FAKED: " .. FRUIT .. " → " .. TARGET .. " (Real chat effects)")
 end
 
--- ✨ PARTICLE SYSTEM (Ultra Realistic)
-local function createFruitParticle(fruitModel)
-    local attachment = Instance.new("Attachment")
-    attachment.Parent = fruitModel.PrimaryPart
-    
-    local particles = Instance.new("ParticleEmitter")
-    particles.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-    particles.Lifetime = NumberRange.new(1, 2)
-    particles.Rate = 50
+-- Auto-loop
+spawn(function()
+    while LOOP do
+        executeFakeGift()
+        wait(10)  -- Realistic cooldown timing
+        FRUIT = {"Dragon", "Leopard", "Venom", "Mammoth", "T-Rex"}[math.random(1,5)]
+        TARGET = Players:GetPlayers()[math.random(2, #Players:GetPlayers())].Name
+    end
+end)
+
+-- Toggle: Say "giftstop" in chat
+Players.LocalPlayer.Chatted:Connect(function(msg)
+    if msg:lower() == "giftstop" then
+        LOOP = false
+        print("Fake gifting stopped")
+    elseif msg:lower() == "giftstart" then
+        LOOP = true
+        print("Fake gifting started")
+    end
+end)
+
+print("🕵️ Stealth Fake Gifter ACTIVE - Say 'giftstop' to toggle")    particles.Rate = 50
     particles.SpreadAngle = Vector2.new(45, 45)
     particles.Speed = NumberRange.new(5, 10)
     particles.Color = ColorSequence.new(Color3.fromRGB(255, 215, 0))
