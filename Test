@@ -1,182 +1,30 @@
--- Blox Fruits STEALTH Fake Permanent Gifter v2.0
--- Invisible, realistic effects only
-
+-- Multi-Fruit Fake Gifter (ALL 38 Fruits)
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
 
--- Config
-local TARGET = "TargetPlayerName"  -- Change or randomize
-local FRUIT = "Dragon"  -- Dragon/Leopard/Venom/etc.
-local LOOP = true  -- Auto-repeat every 10s
+-- ALL Permanent Fruits List
+local fruits = {"Rocket", "Spin", "Chop", "Spring", "Bomb", "Smoke", "Spike", "Flame", "Falcon", "Ice", "Sand", "Dark", "Diamond", "Light", "Rubber", "Barrier", "Magma", "Quake", "Buddha", "Love", "Spider", "Sound", "Phoenix", "Portal", "Lightning", "Pain", "Blizzard", "Gravity", "Mammoth", "T-Rex", "Dragon", "Tiger", "Kitsune", "Dough", "Shadow", "Venom", "Spirit", "Control"}
 
--- Real remote paths (Blox Fruits exact)
-local giftRemote = ReplicatedStorage.Remotes.CommF_:InvokeServer  -- Main comm
-local chatRemote = ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest
-
--- Fake gift sequence (mimics REAL gifting)
-local function executeFakeGift()
-    local targetPlayer = Players:FindFirstChild(TARGET)
-    if not targetPlayer then 
-        TARGET = Players:GetPlayers()[math.random(2, #Players:GetPlayers())].Name  -- Random nearby
-        targetPlayer = Players:FindFirstChild(TARGET)
-    end
-    
-    -- 1. Fire fake gift remote (invisible)
-    pcall(function()
-        ReplicatedStorage.Remotes["GiftPermanentFruit"]:FireServer(TARGET, FRUIT)
-    end)
-    
-    -- 2. Server-style chat notifications (everyone sees)
-    chatRemote:FireServer(player.Name .. " gifted a Permanent " .. FRUIT .. " to " .. TARGET .. "!", "All")
-    wait(0.5)
-    chatRemote:FireServer("💎 " .. player.Name .. " gifted Permanent " .. FRUIT .. " worth 25k Robux to " .. TARGET .. "!", "All")
-    
-    -- 3. Cooldown message (realistic)
-    chatRemote:FireServer(player.Name .. " (2h cooldown active)", "All")
-    
-    -- 4. Target receives "confirmation" (private chat)
-    chatRemote:FireServer("You received Permanent " .. FRUIT .. " from " .. player.Name .. "! Value: 25,000 Robux", "All")
-    
-    print("🎁 FAKED: " .. FRUIT .. " → " .. TARGET .. " (Real chat effects)")
+-- 1. Finds random targets
+local targets = {}
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= player then table.insert(targets, p.Name) end
 end
 
--- Auto-loop
-spawn(function()
-    while LOOP do
-        executeFakeGift()
-        wait(10)  -- Realistic cooldown timing
-        FRUIT = {"Dragon", "Leopard", "Venom", "Mammoth", "T-Rex"}[math.random(1,5)]
-        TARGET = Players:GetPlayers()[math.random(2, #Players:GetPlayers())].Name
-    end
-end)
-
--- Toggle: Say "giftstop" in chat
-Players.LocalPlayer.Chatted:Connect(function(msg)
-    if msg:lower() == "giftstop" then
-        LOOP = false
-        print("Fake gifting stopped")
-    elseif msg:lower() == "giftstart" then
-        LOOP = true
-        print("Fake gifting started")
-    end
-end)
-
-print("🕵️ Stealth Fake Gifter ACTIVE - Say 'giftstop' to toggle")    particles.Rate = 50
-    particles.SpreadAngle = Vector2.new(45, 45)
-    particles.Speed = NumberRange.new(5, 10)
-    particles.Color = ColorSequence.new(Color3.fromRGB(255, 215, 0))
-    particles.Parent = attachment
-end
-
--- 🎵 SOUND EFFECTS
-local function playGiftSounds()
-    local whoosh = Instance.new("Sound")
-    whoosh.SoundId = "rbxasset://sounds/electronicpingshort.wav"
-    whoosh.Volume = 0.7
-    whoosh.Parent = workspace
-    whoosh:Play()
+-- 2. Spam chat with fake gifts (RANDOM FRUIT)
+while true do
+    local target = targets[math.random(1, #targets)]
+    local fruit = fruits[math.random(1, #fruits)]  -- PICK RANDOM FRUIT
     
-    wait(1.5)
+    -- Fake gift messages (everyone sees)
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+        player.Name .. " gifted Permanent " .. fruit .. " to " .. target .. " (25k Robux) 💎", "All"
+    )
     
-    local success = Instance.new("Sound")
-    success.SoundId = "rbxasset://sounds/success.wav"
-    success.Volume = 1
-    success.Parent = workspace
-    success:Play()
-end
-
--- 🚀 MAIN GIFT ANIMATION
-local function executeGiftAnimation()
-    local confirmBtn, gui = createGiftUI()
+    -- Cooldown fake
+    game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(
+        player.Name .. " 2h cooldown", "All"
+    )
     
-    confirmBtn.MouseButton1Click:Connect(function()
-        gui:Destroy()
-        
-        -- 🎬 ANIMATION SEQUENCE STARTS
-        print("🌟 Gifting " .. GIFT_CONFIG.fruitName .. " to " .. GIFT_CONFIG.targetPlayer .. "!")
-        
-        -- 1. CREATE 3D FRUIT MODEL
-        local fruit = Instance.new("Part")
-        fruit.Name = GIFT_CONFIG.fruitName .. "Fruit"
-        fruit.Size = Vector3.new(4, 4, 4)
-        fruit.Material = Enum.Material.Neon
-        fruit.BrickColor = BrickColor.new("Bright yellow")
-        fruit.Shape = Enum.PartType.Ball
-        fruit.CanCollide = false
-        fruit.Anchored = true
-        fruit.Position = LocalPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 5, 0)
-        fruit.Parent = workspace
-        
-        -- Fruit emoji decal
-        local decal = Instance.new("Decal")
-        decal.Texture = "rbxasset://textures/face.png"  -- Replace with dragon texture
-        decal.Face = Enum.NormalId.Front
-        decal.Parent = fruit
-        
-        -- 2. PARTICLES & SPIN
-        createFruitParticle(fruit)
-        local spin = TweenService:Create(fruit, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, -1), {Rotation = Vector3.new(0, 360, 0)})
-        spin:Play()
-        
-        -- 3. SOUNDS
-        spawn(playGiftSounds)
-        
-        -- 4. FLY TO TARGET (Arc trajectory)
-        local targetPos = Vector3.new(50, 10, 50)  -- Simulate target location
-        local curveTween = TweenService:Create(fruit, 
-            TweenInfo.new(2.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Position = targetPos, CFrame = CFrame.new(targetPos) * CFrame.Angles(0, math.rad(180), 0)}
-        )
-        curveTween:Play()
-        
-        -- 5. EXPLOSION ON ARRIVAL
-        curveTween.Completed:Connect(function()
-            -- Confetti explosion
-            for i = 1, 50 do
-                local confetti = Instance.new("Part")
-                confetti.Size = Vector3.new(0.5, 0.5, 0.5)
-                confetti.Material = Enum.Material.ForceField
-                confetti.BrickColor = BrickColor.Random()
-                confetti.Position = targetPos
-                confetti.Parent = workspace
-                confetti.AssemblyLinearVelocity = Vector3.new(
-                    math.random(-50, 50),
-                    math.random(20, 60),
-                    math.random(-50, 50)
-                )
-                game:GetService("Debris"):AddItem(confetti, 3)
-            end
-            
-            -- SUCCESS NOTIFICATION
-            local successGui = Instance.new("ScreenGui")
-            local successFrame = Instance.new("Frame")
-            successFrame.Size = UDim2.new(0, 500, 0, 100)
-            successFrame.Position = UDim2.new(0.5, -250, 0.3, 0)
-            successFrame.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
-            successFrame.Parent = successGui
-            successGui.Parent = PlayerGui
-            
-            local successText = Instance.new("TextLabel")
-            successText.Size = UDim2.new(1, 0, 1, 0)
-            successText.BackgroundTransparency = 1
-            successText.Text = "🎉 " .. GIFT_CONFIG.fruitName .. " SUCCESSFULLY gifted to " .. GIFT_CONFIG.targetPlayer .. "!"
-            successText.TextColor3 = Color3.new(1,1,1)
-            successText.TextScaled = true
-            successText.Font = Enum.Font.GothamBold
-            successText.Parent = successFrame
-            
-            -- Fade out
-            TweenService:Create(successFrame, TweenInfo.new(3), {BackgroundTransparency = 1}):Play()
-            game:GetService("Debris"):AddItem(successGui, 4)
-            
-            fruit:Destroy()
-        end)
-    end)
+    wait(5)  -- Spam delay
 end
-
--- 🎮 EXECUTE SCRIPT
-print("🐉 Blox Fruits Realistic Gifting Script LOADED!")
-print("Click 'GIFT IT!' to start the magic ✨")
-executeGiftAnimation()
